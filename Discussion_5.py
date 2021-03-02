@@ -52,19 +52,22 @@ class FireReader():
         Remember that the first row of a CSV contains all of the column names,
         and each value in a CSV is seperated by a comma.
         """
-
+        num_row = 1
         # iterate through each row of the data
         for i in self.raw_data:
+            
+            if num_row != 1:
 
-            # split up the row by column
-            seperated = i.split(' ')
+        # split up the row by column
+                seperated = i.split(',')
 
             # map each part of the row to the correct column
-            self.data_dict['month'].append(seperated[0])
-            self.data_dict['day'].append(seperated[1])
-            self.data_dict['temp'].append(float(seperated[2]))
-            self.data_dict['RH'].append(int(seperated[3]))
-            self.data_dict['area'].append(float(seperated[4]))
+                self.data_dict['month'].append(seperated[0])
+                self.data_dict['day'].append(seperated[1])
+                self.data_dict['temp'].append(float(seperated[2]))
+                self.data_dict['RH'].append(int(seperated[3]))
+                self.data_dict['area'].append(float(seperated[4]))
+            num_row += 1
 
     def largest_fire(self):
         """
@@ -73,8 +76,11 @@ class FireReader():
 
         For example, 1.2
         """
-
-        pass
+        largest = self.data_dict['area'][0]
+        for i in self.data_dict['area']:
+            if i > largest:
+                largest = i
+        return largest
 
 
     def most_fires_month(self):
@@ -87,8 +93,19 @@ class FireReader():
 
         You should replace 'dec' with the correct month.
         """
+        ret_month = self.data_dict['month'][0]
+        num_months = 0
+        month_dict = {}
+        for i in self.data_dict['month']:
+            if i not in month_dict:
+                month_dict[i] = 0
+            month_dict[i] += 1
+        for j, k in month_dict.items():
+            if k > num_months:
+                ret_month = j
+                num_months = k
+        return "The month with the most fires was " + ret_month + "."
 
-        pass
 
     def day_of_week_total(self):
         """
@@ -100,8 +117,16 @@ class FireReader():
 
         The list should be sorted in decending order by the number of fires.
         """
-
-        pass
+        tup_lst = []
+        day_dict = {}
+        for i in self.data_dict['day']:
+            if i not in day_dict:
+                day_dict[i] = 0
+            day_dict[i] += 1
+        for k, j in day_dict.items():
+            tup_lst.append((k, j))
+        tup_lst = sorted(tup_lst, key = lambda x: x[1], reverse = True)
+        return tup_lst
 
     def temp_of_largest(self):
         """
@@ -114,8 +139,17 @@ class FireReader():
         the FIRST index that matches your requested value, but for our purposes
         this is ok.
         """
+        fire = self.largest_fire()
+        temp = 0
+        acum = 0
+        for i in self.raw_data:
+            if acum != 0:
+                i = i.split(",")
+                if float(i[4].rstrip()) == fire:
+                    temp = float(i[2])
+            acum += 1
+        return temp
 
-        pass
 
 
 class TestFireReader(unittest.TestCase):
